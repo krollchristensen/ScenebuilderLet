@@ -1,0 +1,245 @@
+Løsning 1: Simpel brugergrænseflade
+FXML:
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="SimpleController">
+    <Label fx:id="welcomeLabel" layoutX="50" layoutY="50" text="Velkommen til Scene Builder" />
+    <TextField fx:id="inputField" layoutX="50" layoutY="100" />
+    <Button layoutX="50" layoutY="150" text="Klik her" onAction="#handleButtonClick" />
+</AnchorPane>
+
+Controller:
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
+public class SimpleController {
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private TextField inputField;
+
+    @FXML
+    private void handleButtonClick(ActionEvent event) {
+        welcomeLabel.setText(inputField.getText());
+    }
+}
+
+Løsning 2: Tilføj og fjern elementer fra en liste
+FXML:
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="ListController">
+    <ListView fx:id="listView" layoutX="50" layoutY="50" prefHeight="150" prefWidth="200" />
+    <TextField fx:id="inputField" layoutX="50" layoutY="220" />
+    <Button layoutX="50" layoutY="260" text="Tilføj" onAction="#handleAddItem" />
+    <Button layoutX="150" layoutY="260" text="Fjern" onAction="#handleRemoveItem" />
+</AnchorPane>
+
+Controller:
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+
+public class ListController {
+    @FXML
+    private ListView<String> listView;
+    @FXML
+    private TextField inputField;
+
+    private ObservableList<String> items = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        listView.setItems(items);
+    }
+
+    @FXML
+    private void handleAddItem(ActionEvent event) {
+        String input = inputField.getText();
+        if (!input.isEmpty()) {
+            items.add(input);
+            inputField.clear();
+        }
+    }
+
+    @FXML
+    private void handleRemoveItem(ActionEvent event) {
+        String selectedItem = listView.getSelectionModel().getSelectedItem();
+        if (selectedItem != null) {
+            items.remove(selectedItem);
+        }
+    }
+}
+Løsning 3: Simpel lommeregner
+FXML:
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="CalculatorController">
+    <TextField fx:id="firstNumber" layoutX="50" layoutY="50" />
+    <TextField fx:id="secondNumber" layoutX="200" layoutY="50" />
+    <Button layoutX="50" layoutY="100" text="+" onAction="#handleAdd" />
+    <Button layoutX="100" layoutY="100" text="-" onAction="#handleSubtract" />
+    <Button layoutX="150" layoutY="100" text="×" onAction="#handleMultiply" />
+    <Button layoutX="200" layoutY="100" text="÷" onAction="#handleDivide" />
+    <Label fx:id="resultLabel" layoutX="50" layoutY="150" text="Resultat: " />
+</AnchorPane>
+
+Controller:
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
+public class CalculatorController {
+    @FXML
+    private TextField firstNumber;
+    @FXML
+    private TextField secondNumber;
+    @FXML
+    private Label resultLabel;
+
+    @FXML
+    private void handleAdd(ActionEvent event) {
+        calculate((a, b) -> a + b);
+    }
+
+    @FXML
+    private void handleSubtract(ActionEvent event) {
+        calculate((a, b) -> a - b);
+    }
+
+    @FXML
+    private void handleMultiply(ActionEvent event) {
+        calculate((a, b) -> a * b);
+    }
+
+    @FXML
+    private void handleDivide(ActionEvent event) {
+        calculate((a, b) -> a / b);
+    }
+
+    private void calculate(Operation operation) {
+        try {
+            double num1 = Double.parseDouble(firstNumber.getText());
+            double num2 = Double.parseDouble(secondNumber.getText());
+            resultLabel.setText("Resultat: " + operation.apply(num1, num2));
+        } catch (NumberFormatException e) {
+            resultLabel.setText("Ugyldigt input");
+        }
+    }
+
+    @FunctionalInterface
+    interface Operation {
+        double apply(double a, double b);
+    }
+}
+Løsning 4: Skift tema
+FXML:
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="ThemeController">
+    <ComboBox fx:id="themeComboBox" layoutX="50" layoutY="50" onAction="#handleThemeChange">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String>Lyst tema</String>
+                <String>Mørkt tema</String>
+            </FXCollections>
+        </items>
+    </ComboBox>
+    <Label layoutX="50" layoutY="100" text="Vælg dit tema" />
+</AnchorPane>
+Controller:
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
+
+public class ThemeController {
+    @FXML
+    private ComboBox<String> themeComboBox;
+
+    @FXML
+    private void handleThemeChange(ActionEvent event) {
+        Scene scene = themeComboBox.getScene();
+        String selectedTheme = themeComboBox.getValue();
+        scene.getStylesheets().clear();
+        if ("Lyst tema".equals(selectedTheme)) {
+            scene.getStylesheets().add(getClass().getResource("light.css").toExternalForm());
+        } else if ("Mørkt tema".equals(selectedTheme)) {
+            scene.getStylesheets().add(getClass().getResource("dark.css").toExternalForm());
+        }
+    }
+}
+
+Løsning 5: Dynamisk tabel
+FXML:
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="TableController">
+    <TableView fx:id="personTable" layoutX="50" layoutY="50">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Navn" />
+            <TableColumn fx:id="ageColumn" text="Alder" />
+        </columns>
+    </TableView>
+    <TextField fx:id="nameField" layoutX="50" layoutY="220" promptText="Navn" />
+    <TextField fx:id="ageField" layoutX="200" layoutY="220" promptText="Alder" />
+    <Button layoutX="350" layoutY="220" text="Tilføj person" onAction="#handleAddPerson" />
+</AnchorPane>
+
+Controller:
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+public class TableController {
+    @FXML
+    private TableView<Person> personTable;
+    @FXML
+    private TableColumn<Person, String> nameColumn;
+    @FXML
+    private TableColumn<Person, Integer> ageColumn;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField ageField;
+
+    private ObservableList<Person> people = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        ageColumn.setCellValueFactory(new PropertyValueFactory<>("age"));
+        personTable.setItems(people);
+    }
+
+    @FXML
+    private void handleAddPerson() {
+        String name = nameField.getText();
+        try {
+            int age = Integer.parseInt(ageField.getText());
+            people.add(new Person(name, age));
+            nameField.clear();
+            ageField.clear();
+        } catch (NumberFormatException e) {
+            // Handle invalid age input
+        }
+    }
+
+    public static class Person {
+        private String name;
+        private int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+    }
+}
